@@ -1,0 +1,25 @@
+services:
+  mariadb:
+    build: ./requirements/mariadb
+    container_name: mariadb
+    image:
+    ports:
+  nginx:
+    build: ./requirements/nginx
+    container_name: nginx
+    image:
+    ports:
+  wordpress:
+    build: ./requirements/wordpress
+    container_name: wordpress
+    image:
+    ports:
+
+volumes:
+  mariadb:
+
+  wordpress:
+
+networks:
+  inception:
+    driver: bridge
