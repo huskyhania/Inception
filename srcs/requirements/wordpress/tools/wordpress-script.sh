@@ -1,22 +1,52 @@
 #!/bin/sh
 
+# safety measure - exits in case of errors
+set -e
+
 echo "Setting up WordPress..."
-echo "memory_limit = 512M" >> /etc/php83/php.ini
 
-cd /var/www/html
+WEB_ROOT="/var/www/html"
+WP_CLI="/usr/local/bin/wp"
+PHP_INI="/etc/php83/php.ini"
 
-echo "Downloading WordPress client (WP-CLI)..."
+mkdir -p "$WEB_ROOT"
+cd "$WEB_ROOT"
 
-wget -q https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar -O /usr/local/bin/wp || { echo "Failed to download wp-cli.phar"; exit 1; }
+# download wp-cli if not previously installed
+if [ ! -x /usr/local/bin/wp ]; then
+    echo "Downloading WP-CLI..."
+    wget -q https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar -O /usr/local/bin/wp
+    chmod +x "$WP_CLI"
+fi
 
-chmod +x /usr/local/bin/wp
+# allow wp-cli to run as root
+export WP_CLI_ALLOW_ROOT=1
 
+# set memory limit for PHP
+grep -q "^memory_limit" $PHP_INI || echo "memory_limit = 512M" >> $PHP_INI
+
+# wait for mariadb to be ready (up to 5 minutes)
 echo "Checking if MariaDB is running before WordPress setup..."
-mariadb-admin ping --protocol=tcp --host=mariadb -u $WORDPRESS_DATABASE_USER --password=$WORDPRESS_DATABASE_USER_PASSWORD --wait=300
+SUCCESS=0
+for i in $(seq 1 30); do
+    if mariadb-admin ping --protocol=tcp --host=mariadb -u"$WORDPRESS_DATABASE_USER" --password="$WORDPRESS_DATABASE_USER_PASSWORD"; then
+        echo "MariaDB is ready."
+        SUCCESS=1
+        break
+    fi
+    echo "Waiting for MariaDB..."
+    sleep 10
+done
 
-if [ ! -f /var/www/html/wp-config.php ]; then
-    echo "Download, installation and configuration of WordPress files..."
-    wp core download --allow-root
+if [ $SUCCESS -ne 1 ]; then
+    echo "MariaDB remained unavailable for over 5 minutes."
+    exit 1
+fi
+
+# install wordpress if not already installed
+if [ ! -f "$WEB_ROOT/wp-config.php"  ]; then
+    echo "Download and configuration of WordPress..."
+    wp core download
 
     wp config create \
         --dbname=$WORDPRESS_DATABASE_NAME \
@@ -25,26 +55,29 @@ if [ ! -f /var/www/html/wp-config.php ]; then
         --dbhost=mariadb \
         --force
 
-    wp core install --url="$DOMAIN_NAME" --title="$WORDPRESS_TITLE" \
+    wp core install \
+        --url="$DOMAIN_NAME" \
+        --title="$WORDPRESS_TITLE" \
         --admin_user="$WORDPRESS_ADMIN" \
         --admin_password="$WORDPRESS_ADMIN_PASSWORD" \
         --admin_email="$WORDPRESS_ADMIN_EMAIL" \
-        --allow-root \
         --skip-email \
-        --path=/var/www/html
+        --path="$WEB_ROOT"
 
-    echo "Creating a WordPress user..."
+    echo "Creating WordPress user..."
     wp user create \
-        --allow-root \
-        $WORDPRESS_USER $WORDPRESS_USER_EMAIL \
+        $WORDPRESS_USER 
+        $WORDPRESS_USER_EMAIL \
         --user_pass=$WORDPRESS_USER_PASSWORD
 else
-    echo "==> WordPress is already downloaded, installed, and configured."
+    echo "WordPress is already installed and configured."
 fi
 
-chown -R www-data:www-data /var/www/html
+# Ensure ownership and permissions
+chown -R www-data:www-data "$WEB_ROOT"
 
-chmod -R 755 /var/www/html/
+find "$WEB_ROOT" -type d -exec chmod 755 {} \;   # directories
+find "$WEB_ROOT" -type f -exec chmod 644 {} \;   # files
 
 echo "Running PHP-FPM in the foreground..."
 php-fpm83 -F

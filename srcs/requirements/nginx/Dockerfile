@@ -2,21 +2,21 @@ FROM alpine:3.21.3
 
 RUN apk update && apk add nginx openssl
 
-EXPOSE 443
-
-RUN mkdir -p /etc/nginx/ssl
-
-RUN openssl req -x509 -nodes \
+#create a directory for SSL certificate and generate a self-signed cert
+RUN mkdir -p /etc/nginx/ssl && \
+	openssl req -x509 -nodes \
 	-out /etc/nginx/ssl/public_certificate.crt \
 	-keyout /etc/nginx/ssl/private.key \
-	-subj "/C=FI/ST=Uusimaa/L=Helsinki/O=42/OU=Hive/CN=hskrzypi.42.fr"
+	-subj "/CN=hskrzypi.42.fr"
 
 RUN adduser -D -H -s /sbin/nologin -g www-data -G www-data www-data
 
 COPY ./conf/nginx.conf /etc/nginx/nginx.conf
 
+EXPOSE 443
+
 RUN chmod 644 /etc/nginx/nginx.conf
 
-CMD ["nginx", "-c", "/etc/nginx/nginx.conf", "-g", "daemon off;"]
+CMD ["nginx", "-g", "daemon off;"]
 
 

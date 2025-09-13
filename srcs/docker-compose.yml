@@ -2,23 +2,39 @@ services:
   mariadb:
     build: ./requirements/mariadb
     container_name: mariadb
+    restart: always
     image:
-    ports:
+    ports: 3306
+    volumes: 
+      - mariadb_vol:/var/www/html
   nginx:
     build: ./requirements/nginx
     container_name: nginx
+    restart: always
     image:
-    ports:
+    ports: 443
   wordpress:
     build: ./requirements/wordpress
     container_name: wordpress
+    restart: always
     image:
     ports:
+    volumes:
+      - wordpress_vol:/var/www/html
 
 volumes:
-  mariadb:
-
-  wordpress:
+  mariadb_vol:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/hskrzypi/data/mariadb_database
+  wordpress_vol:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/hskrzypi/data/wordpress_database
 
 networks:
   inception:
