@@ -1,26 +1,38 @@
 services:
   mariadb:
     build: ./requirements/mariadb
-    container_name: mariadb
+    image: mariadb
+    container_name: my_mariadb
     restart: always
-    image:
-    ports: 3306
+    env_file: ./requirements/env
+    ports:
+      - "3306:3306"
     volumes: 
-      - mariadb_vol:/var/www/html
+      - mariadb_vol:/var/lib/mysql
+    networks:
+      - inception
+
   nginx:
     build: ./requirements/nginx
-    container_name: nginx
+    image: nginx
+    container_name: my_nginx
     restart: always
-    image:
-    ports: 443
+    env_file: ./requirements/env
+    ports: 
+      - "443:443"
+    networks:
+      - inception
+
   wordpress:
     build: ./requirements/wordpress
-    container_name: wordpress
+    image: wordpress
+    container_name: my_wordpress
     restart: always
-    image:
-    ports:
+    env_file: ./requirements/env
     volumes:
       - wordpress_vol:/var/www/html
+    networks:
+      - inception
 
 volumes:
   mariadb_vol:

@@ -1,18 +1,17 @@
 DATA_DIR=/home/hskrzypi/data
-MARIADB_DIR=$(DATA_DIR)/mariadb
-WORDPRESS_DIR=$(DATA_DIR)/wordpress
+MARIADB_DIR=$(DATA_DIR)/mariadb_database
+WORDPRESS_DIR=$(DATA_DIR)/wordpress_database
 
 COMPOSE_FILE=srcs/docker-compose.yml
 
-all: mariadb_data wordpress_data
-	@echo "Creating MariaDB data directory..."
-	@mkdir -p $(MARIADB_DIR)
-	@echo "Creating WordPress data directory..."
-	@mkdir -p $(WORDPRESS_DIR)
-	@echo "Building and running containers..."
-	@$(MAKE) images
-	@$(MAKE) up
+all: mariadb_data wordpress_data images up
 	@echo "...And we are done."
+
+mariadb_data:
+	@mkdir -p $(MARIADB_DIR)
+
+wordpress_data:
+	@mkdir -p $(WORDPRESS_DIR)
 
 images:
 	@echo "Building Docker images..."
@@ -27,7 +26,7 @@ down:
 	@docker compose -f $(COMPOSE_FILE) down
 
 clean:
-	@echo "Removing containes, images and volumes..."
+	@echo "Removing containers, images and volumes..."
 	@docker compose -f $(COMPOSE_FILE) down --rmi all -v 
 
 fclean: clean
