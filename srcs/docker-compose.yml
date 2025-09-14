@@ -20,6 +20,9 @@ services:
     env_file: ./requirements/env
     ports: 
       - "443:443"
+    depends_on:
+      wordpress:
+        condition: service_healthy
     networks:
       - inception
 
@@ -29,6 +32,13 @@ services:
     container_name: my_wordpress
     restart: always
     env_file: ./requirements/env
+    depends_on: 
+      - mariadb
+    healthcheck:
+      test: ["CMD", "pgrep", "php-fpm83"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
     volumes:
       - wordpress_vol:/var/www/html
     networks:

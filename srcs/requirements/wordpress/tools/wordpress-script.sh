@@ -23,7 +23,7 @@ fi
 export WP_CLI_ALLOW_ROOT=1
 
 # set memory limit for PHP
-grep -q "^memory_limit" $PHP_INI || echo "memory_limit = 512M" >> $PHP_INI
+echo "memory_limit = 512M" >> $PHP_INI
 
 # wait for mariadb to be ready (up to 5 minutes)
 echo "Checking if MariaDB is running before WordPress setup..."
@@ -65,10 +65,8 @@ if [ ! -f "$WEB_ROOT/wp-config.php"  ]; then
         --path="$WEB_ROOT"
 
     echo "Creating WordPress user..."
-    wp user create \
-        $WORDPRESS_USER 
-        $WORDPRESS_USER_EMAIL \
-        --user_pass=$WORDPRESS_USER_PASSWORD
+    wp user create "$WORDPRESS_USER" "$WORDPRESS_USER_EMAIL" --user_pass="$WORDPRESS_USER_PASSWORD" || true
+
 else
     echo "WordPress is already installed and configured."
 fi
