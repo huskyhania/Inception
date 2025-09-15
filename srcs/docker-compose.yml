@@ -31,6 +31,8 @@ services:
         condition: service_healthy
     networks:
       - inception
+    volumes:
+      - wordpress_vol:/var/www/html
 
   wordpress:
     build: ./requirements/wordpress
