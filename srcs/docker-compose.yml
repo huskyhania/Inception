@@ -11,6 +11,12 @@ services:
       - mariadb_vol:/var/lib/mysql
     networks:
       - inception
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -hmariadb -P3306 -u$${MYSQL_USER} -p$${MYSQL_PASSWORD} --silent || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
 
   nginx:
     build: ./requirements/nginx
@@ -33,7 +39,8 @@ services:
     restart: always
     env_file: ./requirements/env
     depends_on: 
-      - mariadb
+      mariadb:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "pgrep", "php-fpm83"]
       interval: 10s

@@ -4,7 +4,7 @@ WORDPRESS_DIR=$(DATA_DIR)/wordpress_database
 
 COMPOSE_FILE=srcs/docker-compose.yml
 
-all: mariadb_data wordpress_data images up
+all: mariadb_data wordpress_data build up
 	@echo "...And we are done."
 
 mariadb_data:
@@ -13,7 +13,7 @@ mariadb_data:
 wordpress_data:
 	@mkdir -p $(WORDPRESS_DIR)
 
-images:
+build:
 	@echo "Building Docker images..."
 	@docker compose -f $(COMPOSE_FILE) build
 
@@ -36,5 +36,5 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: all clean fclean re up down mariadb_data wordpress_data images
+.PHONY: all clean fclean re up down mariadb_data wordpress_data build
 
