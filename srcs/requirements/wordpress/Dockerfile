@@ -21,4 +21,4 @@ RUN adduser -D -H -s /sbin/nologin -g www-data -G www-data www-data
 
 EXPOSE 9000
 
-CMD ["wordpress-script.sh"]
+ENTRYPOINT ["wordpress-script.sh"]
