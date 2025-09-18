@@ -29,7 +29,7 @@ echo "memory_limit = 512M" >> $PHP_INI
 echo "[vvv] Checking if MariaDB is running before WordPress setup..."
 SUCCESS=0
 for i in $(seq 1 30); do
-    if mariadb-admin ping --protocol=tcp --host=mariadb -u"$WORDPRESS_DB_USER" --password="$WORDPRESS_DB_PASSWORD"; then
+    if mariadb-admin ping --protocol=tcp --host=mariadb -u"$DB_USER" --password="$DB_PASSWORD"; then
         echo "[ vvv ] MariaDB is ready."
         SUCCESS=1
         break
@@ -49,10 +49,10 @@ if [ ! -f "$WEB_ROOT/wp-config.php"  ]; then
     wp core download
 
     wp config create \
-        --dbname=$WORDPRESS_DB_NAME \
-        --dbuser=$WORDPRESS_DB_USER \
-        --dbpass=$WORDPRESS_DB_PASSWORD \
-        --dbhost=mariadb \
+        --dbname=$DB_NAME \
+        --dbuser=$DB_USER \
+        --dbpass=$DB_PASSWORD \
+        --dbhost=$DB_HOST \
         --force
 
     wp core install \
