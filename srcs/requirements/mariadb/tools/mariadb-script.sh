@@ -12,7 +12,7 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
 	mariadb-install-db --basedir=/usr --user=mysql --datadir=/var/lib/mysql >/dev/null
 
 	echo "[ vvv ] Creating WordPress database and user..."
-	mysqld --user=mysql --bootstrap << EOF
+	mariadbd --user=mysql --bootstrap << EOF
 USE mysql;
 FLUSH PRIVILEGES;
 
@@ -32,4 +32,4 @@ else
 fi
 
 echo "[ vvv ] Starting MariaDB server..."
-exec mysqld --defaults-file=/etc/my.cnf.d/mariadb_config
+exec mariadbd --defaults-file=/etc/my.cnf.d/mariadb_config
