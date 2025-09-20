@@ -23,7 +23,7 @@ fi
 export WP_CLI_ALLOW_ROOT=1
 
 # set memory limit for PHP
-echo "memory_limit = 512M" >> $PHP_INI
+echo "memory_limit = 1024M" >> $PHP_INI
 
 # wait for mariadb to be ready (up to 5 minutes)
 echo "[vvv] Checking if MariaDB is running before WordPress setup..."
@@ -54,6 +54,18 @@ if [ ! -f "$WEB_ROOT/wp-config.php"  ]; then
         --dbpass=$DB_PASSWORD \
         --dbhost=$DB_HOST \
         --force
+
+    echo ">>> Enabling HTTPS for Wordpress..."
+    sed -i "/\/\* That's all, stop editing/i \
+if ((!empty(\$_SERVER['HTTPS']) && \$_SERVER['HTTPS'] !== 'off') || (!empty(\$_SERVER['HTTP_X_FORWARDED_PROTO']) && \$_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')) { \$_SERVER['HTTPS'] = 'on'; } \
+if (!defined('FORCE_SSL_ADMIN')) define('FORCE_SSL_ADMIN', true); \
+if (defined('WP_CLI') || php_sapi_name() == 'cli') { \
+    define('WP_HOME', 'http://nginx'); \
+    define('WP_SITEURL', 'http://nginx'); \
+} else { \
+    define('WP_HOME', 'https://' . rtrim('$DOMAIN_NAME', '/')); \
+    define('WP_SITEURL', 'https://' . rtrim('$DOMAIN_NAME', '/')); \
+}" "$WEB_ROOT/wp-config.php"
 
     wp core install \
         --url="$DOMAIN_NAME" \

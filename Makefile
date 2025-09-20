@@ -28,11 +28,11 @@ down:
 clean:
 	@echo "Removing containers, images and volumes..."
 	@docker compose -f $(COMPOSE_FILE) down --rmi all -v 
+	@docker system prune -f --volumes
 
 fclean: clean
 	@echo "Removing data directories..."
 	@sudo rm -rf $(DATA_DIR)
-	@docker system prune -f --volumes
 
 re: fclean all
 

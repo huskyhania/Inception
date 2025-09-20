@@ -9,8 +9,6 @@ services:
       - mysql_root_password
     environment:
       MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root_password
-    ports:
-      - "3306:3306"
     volumes: 
       - mariadb_vol:/var/lib/mysql
     networks:
@@ -39,6 +37,8 @@ services:
       - inception
     volumes:
       - wordpress_vol:/var/www/html
+    extra_hosts:
+      - "hskrzypi.42.fr:127.0.0.1"
 
   wordpress:
     build: ./requirements/wordpress
@@ -58,6 +58,19 @@ services:
       - wordpress_vol:/var/www/html
     networks:
       - inception
+    environment:
+      WORDPRESS_HOME: https://hskrzypi.42.fr
+      WORDPRESS_SITEURL: https://hskrzypi.42.fr
+      WORDPRESS_CONFIG_EXTRA: |
+        if (isset($$_SERVER['HTTP_X_FORWARDED_PROTO']) && $$_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') {
+            $$_SERVER['HTTPS'] = 'on';
+        }
+        if (!defined('FORCE_SSL_ADMIN')) {
+            define('FORCE_SSL_ADMIN', true);
+        }
+    extra_hosts:
+      - "hskrzypi.42.fr:127.0.0.1"
+
 
 volumes:
   mariadb_vol:
