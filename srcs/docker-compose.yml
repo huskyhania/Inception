@@ -17,7 +17,7 @@ services:
       test: ["CMD-SHELL", "mariadb-admin ping -h localhost -u root -p$(cat /run/secrets/mysql_root_password) || exit 1"]
       interval: 10s
       timeout: 5s
-      retries: 10
+      retries: 15
       start_period: 20s
 
   nginx:
@@ -51,7 +51,7 @@ services:
       test: ["CMD", "pgrep", "php-fpm83"]
       interval: 10s
       timeout: 5s
-      retries: 10
+      retries: 15
     volumes:
       - wordpress_vol:/var/www/html
     networks:
