@@ -26,7 +26,7 @@ RUN mkdir -p /var/lib/nginx/tmp/fastcgi \
     && chown -R www-data:www-data /var/www
 
 
-COPY ./tools/wordpress-script.sh /usr/local/bin/wordpress-entrypoint.sh
+COPY ./tools/wordpress-entrypoint.sh /usr/local/bin/wordpress-entrypoint.sh
 RUN chmod +x /usr/local/bin/wordpress-entrypoint.sh
 
 

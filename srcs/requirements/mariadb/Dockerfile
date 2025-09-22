@@ -6,9 +6,9 @@ COPY ./conf/custom.cnf /etc/my.cnf.d/custom.cnf
 
 RUN chmod 644 /etc/my.cnf.d/custom.cnf
 
-COPY ./tools/mariadb-script.sh /usr/local/bin/mariadb-script.sh
+COPY ./tools/mariadb-entrypoint.sh /usr/local/bin/mariadb-entrypoint.sh
 
-RUN chmod +x /usr/local/bin/mariadb-script.sh
+RUN chmod +x /usr/local/bin/mariadb-entrypoint.sh
 
 EXPOSE 3306
 

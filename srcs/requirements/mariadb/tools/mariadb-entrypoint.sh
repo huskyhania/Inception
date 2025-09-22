@@ -16,6 +16,7 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
 USE mysql;
 FLUSH PRIVILEGES;
 
+MYSQL_ROOT_PASSWORD="$(cat /run/secrets/mysql_root_password)"
 ALTER USER 'root'@'localhost' IDENTIFIED BY "$MYSQL_ROOT_PASSWORD";
 CREATE DATABASE $DB_NAME CHARACTER SET utf8 COLLATE utf8_general_ci;
 CREATE USER IF NOT EXISTS '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWORD';
