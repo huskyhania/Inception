@@ -3,7 +3,7 @@
 # safety measure - exits in case of errors
 set -e
 
-echo "[ vvv ] Setting up WordPress..."
+echo "Setting up WordPress..."
 
 WEB_ROOT="/var/www/html"
 WP_CLI="/usr/local/bin/wp"
@@ -14,7 +14,7 @@ cd "$WEB_ROOT"
 
 # download wp-cli if not previously installed
 if [ ! -x /usr/local/bin/wp ]; then
-    echo "[ vvv ] Downloading WP-CLI..."
+    echo "Downloading WP-CLI..."
     wget -q https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar -O /usr/local/bin/wp
     chmod +x "$WP_CLI"
 fi
@@ -26,7 +26,7 @@ export WP_CLI_ALLOW_ROOT=1
 echo "memory_limit = 1024M" >> $PHP_INI
 
 # wait for mariadb to be ready (up to 5 minutes)
-echo "[vvv] Checking if MariaDB is running before WordPress setup..."
+echo "Checking if MariaDB is running before WordPress setup..."
 SUCCESS=0
 for i in $(seq 1 30); do
     if mariadb-admin ping --protocol=tcp --host=mariadb -u"$DB_USER" --password="$DB_PASSWORD"; then
@@ -39,13 +39,13 @@ for i in $(seq 1 30); do
 done
 
 if [ $SUCCESS -ne 1 ]; then
-    echo "[ vvv ] MariaDB remained unavailable for over 5 minutes."
+    echo "MariaDB remained unavailable for over 5 minutes."
     exit 1
 fi
 
 # install wordpress if not already installed
 if [ ! -f "$WEB_ROOT/wp-config.php"  ]; then
-    echo "[ vvv ] Download and configuration of WordPress..."
+    echo "Download and configuration of WordPress..."
     wp core download
 
     wp config create \
@@ -55,7 +55,7 @@ if [ ! -f "$WEB_ROOT/wp-config.php"  ]; then
         --dbhost=$DB_HOST \
         --force
 
-    echo ">>> Enabling HTTPS for Wordpress..."
+    echo "Enabling HTTPS for Wordpress..."
     sed -i "/\/\* That's all, stop editing/i \
 if ((!empty(\$_SERVER['HTTPS']) && \$_SERVER['HTTPS'] !== 'off') || (!empty(\$_SERVER['HTTP_X_FORWARDED_PROTO']) && \$_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')) { \$_SERVER['HTTPS'] = 'on'; } \
 if (!defined('FORCE_SSL_ADMIN')) define('FORCE_SSL_ADMIN', true); \
@@ -76,11 +76,11 @@ if (defined('WP_CLI') || php_sapi_name() == 'cli') { \
         --skip-email \
         --path="$WEB_ROOT"
 
-    echo "[ vvv ] Creating WordPress user..."
+    echo "Creating WordPress user..."
     wp user create "$WORDPRESS_USER" "$WORDPRESS_USER_EMAIL" --user_pass="$WORDPRESS_USER_PASSWORD" || true
 
 else
-    echo "[ vvv ] WordPress is already installed and configured."
+    echo "WordPress is already installed and configured."
 fi
 
 # Ensure ownership and permissions

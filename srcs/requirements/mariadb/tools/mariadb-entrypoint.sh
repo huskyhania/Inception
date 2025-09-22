@@ -1,6 +1,6 @@
 #!/bin/sh
 
-echo "[ vvv ] Setting up MariaDB directory..."
+echo "Setting up MariaDB directory..."
 chmod -R 755 /var/lib/mysql
 
 mkdir -p /run/mysqld
@@ -8,10 +8,10 @@ mkdir -p /run/mysqld
 chown -R mysql:mysql /var/lib/mysql /run/mysqld
 
 if [ ! -d "/var/lib/mysql/mysql" ]; then
-	echo "[ vvv ] Initializing MariaDB system tables..."
+	echo "Initializing MariaDB system tables..."
 	mariadb-install-db --basedir=/usr --user=mysql --datadir=/var/lib/mysql >/dev/null
 
-	echo "[ vvv ] Creating WordPress database and user..."
+	echo "Creating WordPress database and user..."
 	mariadbd --user=mysql --bootstrap << EOF
 USE mysql;
 FLUSH PRIVILEGES;
@@ -28,8 +28,8 @@ FLUSH PRIVILEGES;
 EOF
 
 else
-	echo "[ vvv ] MariaDB already installed. Database and users configured."
+	echo "MariaDB already installed. Database and users configured."
 fi
 
-echo "[ vvv ] Starting MariaDB server..."
-exec mariadbd --defaults-file=/etc/my.cnf.d/mariadb_config
+echo "Starting MariaDB server..."
+exec mariadbd --defaults-file=/etc/my.cnf.d/custom.cnf
