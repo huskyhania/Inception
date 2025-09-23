@@ -1,8 +1,7 @@
 #!/bin/sh
 
-ROOT_PASSWORD_FILE="/run/secrets/mysql_root_password"
-if [ -f "$ROOT_PASSWORD_FILE" ]; then
-  MYSQL_ROOT_PASSWORD="$(cat "$ROOT_PASSWORD_FILE")"
+if [ -f /run/secrets/mysql_root_password ]; then
+  export MYSQL_ROOT_PASSWORD="$(cat /run/secrets/mysql_root_password)"
 else
   echo "[ERROR] Root password secret not found!"
   exit 1
@@ -10,6 +9,9 @@ fi
 
 if [ -f /run/secrets/db_password ]; then
     export DB_PASSWORD="$(cat /run/secrets/db_password)"
+else
+  echo "[ERROR] DB password secret not found!"
+  exit 1
 fi
 
 
