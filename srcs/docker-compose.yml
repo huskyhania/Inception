@@ -84,10 +84,10 @@ networks:
 
 secrets:
   mysql_root_password:
-    file: ./requirements/mysql_root_password.txt
+    file: ./requirements/secrets/mysql_root_password.txt
   wordpress_admin_password:
-    file: ./requirements/wordpress_admin_password.txt
+    file: ./requirements/secrets/wordpress_admin_password.txt
   wordpress_user_password:
-    file: ./requirements/wordpress_user_password.txt
+    file: ./requirements/secrets/wordpress_user_password.txt
   db_password:
-    file: ./requirements/db_password.txt
+    file: ./requirements/secrets/db_password.txt
