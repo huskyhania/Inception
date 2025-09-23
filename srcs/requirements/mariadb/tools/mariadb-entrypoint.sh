@@ -1,5 +1,18 @@
 #!/bin/sh
 
+ROOT_PASSWORD_FILE="/run/secrets/mysql_root_password"
+if [ -f "$ROOT_PASSWORD_FILE" ]; then
+  MYSQL_ROOT_PASSWORD="$(cat "$ROOT_PASSWORD_FILE")"
+else
+  echo "[ERROR] Root password secret not found!"
+  exit 1
+fi
+
+if [ -f /run/secrets/db_password ]; then
+    export DB_PASSWORD="$(cat /run/secrets/db_password)"
+fi
+
+
 echo "Setting up MariaDB directory..."
 chmod -R 755 /var/lib/mysql
 
@@ -24,6 +37,7 @@ GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'%';
 CREATE USER IF NOT EXISTS '$DB_USER'@'localhost' IDENTIFIED BY '$DB_PASSWORD';
 ALTER USER '$DB_USER'@'localhost' IDENTIFIED BY '$DB_PASSWORD';
 GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'localhost';
+DELETE FROM mysql.user WHERE User='';
 FLUSH PRIVILEGES;
 EOF
 

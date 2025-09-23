@@ -1,9 +1,30 @@
 #!/bin/sh
 
 # safety measure - exits in case of errors
-set -e
+set -eu
 
 echo "Setting up WordPress..."
+
+if [ -f /run/secrets/wordpress_admin_password ]; then
+    export WORDPRESS_ADMIN_PASSWORD="$(cat /run/secrets/wordpress_admin_password)"
+else
+    echo "[ERROR] Missing /run/secrets/wordpress_admin_password"
+    exit 1
+fi
+
+if [ -f /run/secrets/wordpress_user_password ]; then
+    export WORDPRESS_USER_PASSWORD="$(cat /run/secrets/wordpress_user_password)"
+else
+    echo "[ERROR] Missing /run/secrets/wordpress_user_password"
+    exit 1
+fi
+
+if [ -f /run/secrets/db_password ]; then
+    export DB_PASSWORD="$(cat /run/secrets/db_password)"
+else
+    echo "[ERROR] Missing /run/secrets/db_password"
+    exit 1
+fi
 
 WEB_ROOT="/var/www/html"
 WP_CLI="/usr/local/bin/wp"
@@ -30,11 +51,11 @@ echo "Checking if MariaDB is running before WordPress setup..."
 SUCCESS=0
 for i in $(seq 1 30); do
     if mariadb-admin ping --protocol=tcp --host=mariadb -u"$DB_USER" --password="$DB_PASSWORD"; then
-        echo "[ vvv ] MariaDB is ready."
+        echo "MariaDB is ready."
         SUCCESS=1
         break
     fi
-    echo "[ vvv ] Waiting for MariaDB..."
+    echo "Waiting for MariaDB..."
     sleep 10
 done
 
@@ -89,5 +110,5 @@ chown -R www-data:www-data "$WEB_ROOT"
 find "$WEB_ROOT" -type d -exec chmod 755 {} \;
 find "$WEB_ROOT" -type f -exec chmod 644 {} \;
 
-echo "[ vvv ] Running PHP-FPM in the foreground..."
+echo "Running PHP-FPM in the foreground..."
 exec php-fpm83 -F
