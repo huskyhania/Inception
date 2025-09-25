@@ -20,7 +20,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 15
-      start_period: 20s
+      start_period: 2m
+      start_interval: 5s
 
   nginx:
     build: ./requirements/nginx

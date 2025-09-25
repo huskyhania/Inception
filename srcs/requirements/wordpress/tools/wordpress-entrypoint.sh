@@ -47,22 +47,22 @@ export WP_CLI_ALLOW_ROOT=1
 echo "memory_limit = 1024M" >> $PHP_INI
 
 # wait for mariadb to be ready (up to 5 minutes)
-echo "Checking if MariaDB is running before WordPress setup..."
-SUCCESS=0
-for i in $(seq 1 30); do
-    if mariadb-admin ping --protocol=tcp --host=mariadb -u"$DB_USER" --password="$DB_PASSWORD"; then
-        echo "MariaDB is ready."
-        SUCCESS=1
-        break
-    fi
-    echo "Waiting for MariaDB..."
-    sleep 10
-done
+#echo "Checking if MariaDB is running before WordPress setup..."
+#SUCCESS=0
+#for i in $(seq 1 30); do
+#    if mariadb-admin ping --protocol=tcp --host=mariadb -u"$DB_USER" --password="$DB_PASSWORD"; then
+#        echo "MariaDB is ready."
+#        SUCCESS=1
+#        break
+#    fi
+#    echo "Waiting for MariaDB..."
+#    sleep 10
+#done
 
-if [ $SUCCESS -ne 1 ]; then
-    echo "MariaDB remained unavailable for over 5 minutes."
-    exit 1
-fi
+#if [ $SUCCESS -ne 1 ]; then
+#    echo "MariaDB remained unavailable for over 5 minutes."
+#    exit 1
+#fi
 
 # install wordpress if not already installed
 if [ ! -f "$WEB_ROOT/wp-config.php"  ]; then
